@@ -1,14 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <ctype.h>
-#include <time.h> 
-
-//For Processes
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
+#include "multitest.h"
 
 void scramble(int list[], int size){
   srand(time(NULL));
@@ -20,41 +10,10 @@ void scramble(int list[], int size){
   }
 }
 
-//Search Function returns an index between 0-249, in a subarray of 250 or less
-void search(int size, int *arr, int val, int child){
-    int index;
-    if(child < size/250){ //Search if the array size is 250
-      index = (child+1) * 250; //Child starts at 0, but it's the first child. We determine size by multilying by 250
-      for (int i = index-250; i < index; i++) { //Index is the Cap
-          if (arr[i] == val){
-            if(i%250 == 0){ //i is the actual index, but exit only returns 8bits, so we send an index between 0-249
-              exit(250);
-            }else{
-              exit(i%250);
-            }
-            break;
-          } 
-        }      
-    }else{ // Search if array size is less than 250
-      index = size%250;   
-     // printf("Index is %d\n",index);
-     //  printf("Size is %d\n",size);
-     //  printf("Size-Index is %d\n",size-index);
-      for(int i = (size-index); i < size; i++){  
-         if (arr[i] == val){
-         //   printf("I %d\n",i);
-            exit(i%250);
-            break;
-          } 
-        }
-      } 
-  return;
-    }
-
 
 //Take in a size and a requested value 
 //Values are 1 to size 
-//MAX_SIZE = 100,000. There ulimit -u gives us 2000 processes. We limit it to 400 Max 250 values per 
+//MAX_SIZE = 250,000. There ulimit -u gives us 2000 processes. We limit it to 100 Max 250 values per 
 //Process = size/250 + 1 if Remainder > 0
 //Parent pid changes but we can determine child number by Child Pid - Parent Pid. 
 //So Indexs are covered by 250*(Child Pid - Parnet Pid)
@@ -95,7 +54,7 @@ int main(int argc, char** argv){
     }
   }
   
-  printf("Process = %d\n",processes);
+ // printf("Process = %d\n",processes);
   int value,return_val;
   for(int i = 0; i < processes; i++){
     waitpid(pids[i], &value,WUNTRACED);
