@@ -14,7 +14,8 @@
 #include <unistd.h>
 
 
-void search(int, int *, int, int);
+int search(int, int *, int, int);
 void scramble(int* , int);
+void multi_process(int *, int, int);
 
 #endif
