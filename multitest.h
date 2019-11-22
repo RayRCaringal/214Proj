@@ -17,7 +17,6 @@
 
 int search(int, int *, int, int);
 void scramble(int* , int);
-void scramble_all(int *, int);
 void multi_process(int *, int, int);
 
 #endif
