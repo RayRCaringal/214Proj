@@ -28,7 +28,7 @@ int search(int size, int *arr, int val, int child){
 
 void multi_process(int *list, int val, int size){
   int pid, processes;
-  int pids[size/250];
+  int pids[size/250]; //List of pids 
   //When 250 creates 1 child process, when 251 creates 2 child processes
   if(size < 250){
     processes = 1;
@@ -49,18 +49,10 @@ void multi_process(int *list, int val, int size){
   }
   
   int value;
- // int return_val;
   for(int i = 0; i < processes; i++){
-    waitpid(pids[i], &value,WUNTRACED);
-    if(WEXITSTATUS(value) > 0){ //Gets the return value
-    //  return_val = (250*i)+WEXITSTATUS(value);  
-    }else if(i == processes-1){ //If on the last child, and the return value == 0 then it must be the last index
-   //   return_val = (250*i)-1;  
-    }   
+    waitpid(pids[i], &value,WUNTRACED);   
   }
-   //   printf("Index of %d: %d\n",val, return_val);
  
   
   
 }
-

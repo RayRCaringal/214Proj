@@ -19,4 +19,4 @@ TestCaseB()
     -TestCaseB is TestCaseA() except we do not choose our value in an orderly manner, instead we randomize the value. This accounts
     for the problem we face with scramble, as we only scramble all elements in the beginning. This can theoretically effect run time
     so by randomizing the value searched and taking the average we can compare it to the graph and run time of TestCaseA to ensure
-    accuracy.
+    accuracy. 
