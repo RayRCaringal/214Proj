@@ -83,9 +83,20 @@ int main(int argc, char** argv){
    list[i] = i+1;
   } // Fill the list 
   
-  multi_process(list, val, size);
-        
-       free(list);
+  double time_proc = 0, time_seq = 0;
+  scramble_all(list, size);
+  for(int i = 0; i < 100; i++){
+    time_proc += test_proc(list,size-i, size);
+    time_seq += test_seq(list,size-i,size);
+    scramble(list,size);
+  }
+  printf("The total time taken to find value in Process is: %f seconds\n", time_proc);     
+  printf("The max is %f and the min is %f\n",proc_max, proc_min);
+  printf("Average Proc time is %f\n", time_proc/100);
+  printf("The total time taken to find value in Sequential is: %f seconds\n", time_seq);  
+  printf("Average Seq time is %f\n", time_seq/100);
+  printf("The max is %f and the min is %f\n",seq_max, seq_min);
+  free(list);
   
   
   

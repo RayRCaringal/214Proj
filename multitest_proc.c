@@ -56,17 +56,18 @@ void multi_process(int *list, int val, int size){
   }
   
  // printf("Process = %d\n",processes);
-  int value,return_val;
+  int value;
+  //int return_val;
   for(int i = 0; i < processes; i++){
     waitpid(pids[i], &value,WUNTRACED);
     if(WEXITSTATUS(value) > 0){ //Gets the return value
-      return_val = (250*i)+WEXITSTATUS(value);  
+     // return_val = (250*i)+WEXITSTATUS(value);  
     }else if(i == processes-1){ //If on the last child, and the return value == 0 then it must be the last index
-      return_val = (250*i)-1;  
+     // return_val = (250*i)-1;  
     }
     
   }
-      printf("Index of %d: %d\n",val, return_val);
+   //   printf("Index of %d: %d\n",val, return_val);
  
   
   
