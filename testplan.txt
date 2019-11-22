@@ -1,0 +1,22 @@
+TestCaseA()
+    -We will compare the speed (Elapsed Time), of Processes, Sequnetial Search, and Threads by running tests in intervals of 250 as
+    250 is the MAX size of each subarray. We are limiting the max subarray to 150 giving us a MAX Array Size of 37,500. 
+
+    -Test Case A starts at Array Size 250 and incremenets Array Size by 250 until we reach MAX Array size of 37,500. This leaves us with
+    150 sub arrays. 
+
+    -Each Subarray looks for values in intervals of 50, so the amount of times each search is run for threads or processes is 
+    ArraySize/50.
+
+    -We take the average of the Total Run Time for each method and divide it by ArraySize to get the average run time. 
+
+    -Each subarray is scrambled after all methods have succeded. 
+
+    -This will allow us to see how fast Sequnetial Search is across Multithreading and Multiprocessing at smaller array sizes
+    and larger array sizes
+
+TestCaseB()
+    -TestCaseB is TestCaseA() except we do not choose our value in an orderly manner, instead we randomize the value. This accounts
+    for the problem we face with scramble, as we only scramble all elements in the beginning. This can theoretically effect run time
+    so by randomizing the value searched and taking the average we can compare it to the graph and run time of TestCaseA to ensure
+    accuracy.
