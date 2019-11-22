@@ -16,12 +16,8 @@ int search(int size, int *arr, int val, int child){
         }      
     }else{ // Search if array size is less than 250
       index = size%250;   
-     // printf("Index is %d\n",index);
-     //  printf("Size is %d\n",size);
-     //  printf("Size-Index is %d\n",size-index);
       for(int i = (size-index); i < size; i++){  
          if (arr[i] == val){
-         //   printf("I %d\n",i);
             return i%250;
           } 
         }
@@ -31,7 +27,7 @@ int search(int size, int *arr, int val, int child){
 
 
 void multi_process(int *list, int val, int size){
-   int pid, processes;
+  int pid, processes;
   int pids[size/250];
   //When 250 creates 1 child process, when 251 creates 2 child processes
   if(size < 250){
@@ -41,31 +37,26 @@ void multi_process(int *list, int val, int size){
   }else{
     processes = size/250; 
   }
-  //printf("Processes: %d\n", processes);
   for (int i = 0; i < processes; i++){
     pid = fork();
     if (pid < 0) {
       printf("Fork failed\n");
     }else if (pid == 0) { // Child Process 
-        
-    //  printf("Child is %d\n",i);
       exit(search(size, list, val,i));
     }else{ //Parent Process, stores the pids
       pids[i] = pid;
     }
   }
   
- // printf("Process = %d\n",processes);
   int value;
-  //int return_val;
+ // int return_val;
   for(int i = 0; i < processes; i++){
     waitpid(pids[i], &value,WUNTRACED);
     if(WEXITSTATUS(value) > 0){ //Gets the return value
-     // return_val = (250*i)+WEXITSTATUS(value);  
+    //  return_val = (250*i)+WEXITSTATUS(value);  
     }else if(i == processes-1){ //If on the last child, and the return value == 0 then it must be the last index
-     // return_val = (250*i)-1;  
-    }
-    
+   //   return_val = (250*i)-1;  
+    }   
   }
    //   printf("Index of %d: %d\n",val, return_val);
  
