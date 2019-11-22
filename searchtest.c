@@ -1,4 +1,8 @@
 #include "multitest.h"
+#define DEBUG 0 //Set to 0 if you dont want print, set to 1 if you want printf
+
+
+// REMEMBER TO TURN DEBUG TO 1 BEFORE SUBMISSION
 
 double proc_min = 1;
 double proc_max = -1;
@@ -36,6 +40,7 @@ void scramble(int *list, int size){
 
 //Times Multiprocessing 
  double test_proc(int *list, int val, int size){
+   if(DEBUG) printf("Multiprocessing:\n");
     struct timeval begin, end;
     double elapsed;
     gettimeofday(&begin, NULL);
@@ -47,6 +52,7 @@ void scramble(int *list, int size){
     }else if(elapsed > proc_max){
       proc_max = elapsed;
     }
+   if(DEBUG) printf("Array Size: %d, Value found: %d, Time Elapsed %f\n", size,val,elapsed);
     return elapsed;
 }
 
@@ -74,6 +80,7 @@ double test_seq(int *list, int val, int size){
 //Gets average time for 150 subarrays with each subarray containing 250 elements
 //Averages run time for searches of every 50 elements that are less than the current size
 void testCaseA(){
+   if(DEBUG) printf("Running Test Case A\n");
    for(int size = 250; size < 37500; size += 250){
    time_seq = 0;
    time_proc = 0;
@@ -84,17 +91,21 @@ void testCaseA(){
     scramble_all(list, size);
     for(int i = 50; i < size; i += 50){
       time_proc += test_proc(list,i, size);
+      stD_proc = sqrt(((time_proc * time_proc)/i) - ((time_proc/i) * (time_proc/i)));
       time_seq += test_seq(list,i,size);
+      stD_seq = sqrt(((time_seq*time_seq)/i) - ((time_seq/i) * (time_seq/i)));
       scramble(list,size);
     }
-      printf("Proc: %f, Seq %f\n", time_proc/size, time_seq/size);
+      if(DEBUG) printf("Proc: %f, Seq %f\n", time_proc/size, time_seq/size);
       free(list);
     }
+    return;
 }
 
 //Randomly Generates a Value to be searched, and searches MAX_SIZE of 37,500 elements 
 //Gets the Average Run time for 150 subarrays with each subarray containing 250 elements
 void testCaseB(){
+   if(DEBUG) printf("Running Test Case A\n");
    srand(time(NULL));
    for(int size = 250; size < 37500; size += 250){
    time_seq = 0;
@@ -107,14 +118,36 @@ void testCaseB(){
     for(int x = 50; x < size; x += 50){
     int i = (rand() % (size-1))+1;
     time_proc += test_proc(list,i, size);
+    stD_proc = sqrt(((time_proc * time_proc)/i) - ((time_proc/i) * (time_proc/i)));
     time_seq += test_seq(list,i,size);
+    stD_seq = sqrt(((time_seq*time_seq)/i) - ((time_seq/i) * (time_seq/i)));
     scramble(list,size);
     }
-    printf("Proc: %f, Seq %f\n", time_proc/size, time_seq/size);
+    if(DEBUG) printf("Proc: %f, Seq %f\n", time_proc/size, time_seq/size);
     free(list);
     }
+    return;
 }
-  
+
+void printVals(){
+  printf("The total time taken to find value in Process is: %f seconds\n", time_proc);     
+  printf("The max proc is %f and the min proc is %f\n",proc_max, proc_min);
+  printf("Average Proc time is %f\n", time_proc/100);
+  printf("The Standard Deviation of Proc is %f\n", stD_proc);
+  printf("The total time taken to find value in Sequential is: %f seconds\n", time_seq);  
+  printf("Average Seq time is %f\n", time_seq/100);
+  printf("The max is %f and the min is %f\n",seq_max, seq_min);
+  printf("The Standard Deviation of Seq is %f\n", stD_seq);
+  proc_min = 1;
+  proc_max = -1;
+  seq_min = 1;
+  seq_max = -1;
+  time_proc = 0;
+  time_seq = 0;
+  stD_proc = 0; 
+  stD_seq = 0;
+  return;
+}
 
 
 //Take in a size and a requested value 
@@ -123,42 +156,9 @@ void testCaseB(){
 //Process = size/250 + 1 if Remainder > 0
 //Parent pid changes but we can determine child number by Child Pid - Parent Pid. 
 //So Indexs are covered by 250*(Child Pid - Parnet Pid)
-
-  //  stD_seq = sqrt(((time_seq*time_seq)/i) - ((time_seq/i) * (time_seq/i)));
-  //stD_proc = sqrt(((time_proc * time_proc)/i) - ((time_proc/i) * (time_proc/i)));
-int main(int argc, char** argv){
-
-  testCaseB();
-  
-/*
-  int size = atoi(argv[1]); 
-  int * list = (int*)malloc(sizeof(int) * size);
-  for(int i = 0; i < size; i++){
-   list[i] = i+1;
-  } // Fill the list 
-  
-  double time_proc = 0, time_seq = 0, stD_proc = 0, stD_seq = 0;
-  scramble_all(list, size);
-  for(int i = 0; i < size; i++){
-    //Process
-    time_proc += test_proc(list,size-i, size);
-    stD_proc = sqrt(((time_proc * time_proc)/i) - ((time_proc/i) * (time_proc/i)));
-    
-    //Sequential
-    time_seq += test_seq(list,size-i,size);
-    stD_seq = sqrt(((time_seq*time_seq)/i) - ((time_seq/i) * (time_seq/i)));
-    scramble(list,size);
-  }
-
-  */
-  
-  printf("The total time taken to find value in Process is: %f seconds\n", time_proc);     
-  printf("The max proc is %f and the min proc is %f\n",proc_max, proc_min);
-  printf("Average Proc time is %f\n", time_proc/100);
-  printf("The Standard Deviation of Proc is %f\n", stD_proc);
- printf("The total time taken to find value in Sequential is: %f seconds\n", time_seq);  
-  printf("Average Seq time is %f\n", time_seq/100);
-  printf("The max is %f and the min is %f\n",seq_max, seq_min);
-  printf("The Standard Deviation of Seq is %f\n", stD_seq);
-  
+  int main(int argc, char** argv){
+   testCaseA();
+   printVals();
+   testCaseB();
+   printVals();
 }
