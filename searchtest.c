@@ -1,14 +1,71 @@
 #include "multitest.h"
 
-void scramble(int list[], int size){
+double proc_min = 1;
+double proc_max = -1;
+double seq_min = 1;
+double seq_max = -1;
+
+//Scrambles everything, only use at beginning
+void scramble_all(int *list, int size){
   srand(time(NULL));
   int first,  second;
   for(int i = 0; i < size/2; i++){
-      first = (rand()%size)+1;
-      second =(rand()%size)+1;
+      first = (rand()%(size-1))+1;
+      second = (rand()%(size-1))+1;
+      int temp = list[first];
       list[first] = list[second];
+      list[second] = temp;
   }
 }
+
+//Scrambles once, use after the beginning
+void scramble(int *list, int size){
+  srand(time(NULL));
+  int first,  second;
+  first = (rand()%(size-1))+1;
+  second = (rand()%(size-1))+1;
+  int temp = list[first];
+  list[first] = list[second];
+  list[second] = temp;
+  
+}
+
+//Times Multiprocessing 
+ double test_proc(int *list, int val, int size){
+    struct timeval begin, end;
+    double elapsed;
+    gettimeofday(&begin, NULL);
+    multi_process(list, 123, size);
+    gettimeofday(&end, NULL);
+    elapsed = (double) (end.tv_sec - begin.tv_sec) + (double) ((end.tv_usec - begin.tv_usec)/1000000.0);
+    if(elapsed < proc_min){
+      proc_min = elapsed;
+    }else if(elapsed > proc_max){
+      proc_max = elapsed;
+    }
+    return elapsed;
+}
+
+//Times sequential search 
+double test_seq(int *list, int val, int size){
+     struct timeval begin, end;
+    double elapsed;
+    gettimeofday(&begin, NULL);
+    for(int i = 0; i < size; i++){
+      if(list[i] == val){
+      //  printf("Index of %d: %d\n", i, val);
+      }
+    }
+    gettimeofday(&end, NULL);
+    elapsed = (double) (end.tv_sec - begin.tv_sec) + (double) ((end.tv_usec - begin.tv_usec)/1000000.0);
+    if(elapsed < seq_min){
+      seq_min = elapsed;
+    }else if(elapsed > seq_max){
+      seq_max = elapsed;
+    }
+    return elapsed;
+}
+
 
 
 //Take in a size and a requested value 
@@ -19,55 +76,27 @@ void scramble(int list[], int size){
 //So Indexs are covered by 250*(Child Pid - Parnet Pid)
 int main(int argc, char** argv){
 
-  //printf("%d\n", getpid());
-  int val = atoi(argv[1])-1;
+
   int size = atoi(argv[1]); 
-  //printf("Size is %d\n", size);
   int * list = (int*)malloc(sizeof(int) * size);
   for(int i = 0; i < size; i++){
    list[i] = i+1;
-  // printf("%d\n",list[i]);
   } // Fill the list 
   
-  
-  int pid, processes;
-  int pids[size/250];
-  //When 250 creates 1 child process, when 251 creates 2 child processes
-  if(size < 250){
-    processes = 1;
-  }else if(size%250 > 0){
-    processes = (size/250)+1; 
-  }else{
-    processes = size/250; 
+  double time_proc = 0, time_seq = 0;
+  scramble_all(list, size);
+  for(int i = 0; i < 100; i++){
+    time_proc += test_proc(list,size-i, size);
+    time_seq += test_seq(list,size-i,size);
+    scramble(list,size);
   }
-  //printf("Processes: %d\n", processes);
-  for (int i = 0; i < processes; i++){
-    pid = fork();
-    if (pid < 0) {
-      printf("Fork failed\n");
-    }else if (pid == 0) { // Child Process 
-      search(size, list, val,i);  
-    //  printf("Child is %d\n",i);
-      exit(0);
-    }else{ //Parent Process, stores the pids
-      pids[i] = pid;
-    }
-  }
-  
- // printf("Process = %d\n",processes);
-  int value,return_val;
-  for(int i = 0; i < processes; i++){
-    waitpid(pids[i], &value,WUNTRACED);
-    if(WEXITSTATUS(value) > 0){ //Gets the return value
-      return_val = (250*i)+WEXITSTATUS(value);  
-    }else if(i == processes-1){ //If on the last child, and the return value == 0 then it must be the last index
-      return_val = (250*i)-1;  
-    }
-    
-  }
-      printf("Index of %d: %d\n",val, return_val);
-       
-       free(list);
+  printf("The total time taken to find value in Process is: %f seconds\n", time_proc);     
+  printf("The max is %f and the min is %f\n",proc_max, proc_min);
+  printf("Average Proc time is %f\n", time_proc/100);
+  printf("The total time taken to find value in Sequential is: %f seconds\n", time_seq);  
+  printf("Average Seq time is %f\n", time_seq/100);
+  printf("The max is %f and the min is %f\n",seq_max, seq_min);
+  free(list);
   
   
   
