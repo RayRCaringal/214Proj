@@ -66,8 +66,6 @@ double test_seq(int *list, int val, int size){
     return elapsed;
 }
 
-
-
 //Take in a size and a requested value 
 //Values are 1 to size 
 //MAX_SIZE = 250,000. There ulimit -u gives us 2000 processes. We limit it to 100 Max 250 values per 
@@ -83,19 +81,29 @@ int main(int argc, char** argv){
    list[i] = i+1;
   } // Fill the list 
   
-  double time_proc = 0, time_seq = 0;
+  double time_proc = 0, time_seq = 0, stD_proc = 0, stD_seq = 0;
   scramble_all(list, size);
   for(int i = 0; i < 100; i++){
+    //Process
     time_proc += test_proc(list,size-i, size);
+    stD_proc = sqrt(((time_proc * time_proc)/i) - ((time_proc/i) * (time_proc/i)));
+    
+    //Sequential
     time_seq += test_seq(list,size-i,size);
+    stD_seq = sqrt(((time_seq*time_seq)/i) - ((time_seq/i) * (time_seq/i)));
     scramble(list,size);
   }
+
+
+  
   printf("The total time taken to find value in Process is: %f seconds\n", time_proc);     
-  printf("The max is %f and the min is %f\n",proc_max, proc_min);
+  printf("The max proc is %f and the min proc is %f\n",proc_max, proc_min);
   printf("Average Proc time is %f\n", time_proc/100);
+  printf("The Standard Deviation of Proc is %f\n", stD_proc);
   printf("The total time taken to find value in Sequential is: %f seconds\n", time_seq);  
   printf("Average Seq time is %f\n", time_seq/100);
   printf("The max is %f and the min is %f\n",seq_max, seq_min);
+  printf("The Standard Deviation of Seq is %f\n", stD_seq);
   free(list);
   
   
